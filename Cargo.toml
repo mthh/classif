@@ -1,0 +1,7 @@
+[package]
+name = "classif"
+version = "0.1.0"
+authors = ["Matthieu Viry <matthieu.viry@cnrs.fr>"]
+
+[dependencies]
+num-traits = "^0.1"
