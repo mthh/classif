@@ -1,4 +1,4 @@
-use num_traits::{Float, One, NumAssignOps, Zero};
+use num_traits::{Float, One, NumAssignOps};
 
 // Lets fake a 2D array (square shape matrix) with a 1D vector:
 struct Matrix<T> {
@@ -27,25 +27,24 @@ impl<T: PartialEq + Clone> Matrix<T> {
     }
 }
 
-pub fn get_breaks<T>(values: &mut [T], nb_class: u32) -> Vec<T>
+pub fn get_jenks_breaks<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     where T: Float + NumAssignOps
 {
     let k = nb_class as usize;
-    let nb_elem: usize = values.len();
+    let nb_elem: usize = sorted_values.len();
     let mut v1 = Matrix::new(1, nb_elem);
     let mut v2 = Matrix::new(Float::max_value(), nb_elem);
 
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
     let (mut v, mut val, mut s1, mut s2, mut w, mut i3, mut i4): (T, T, T, T, T, usize, usize);
 
     for l in 2..(nb_elem + 1) {
-        s1 = Zero::zero();
-        s2 = Zero::zero();
-        w = Zero::zero();
+        s1 = T::zero();
+        s2 = T::zero();
+        w = T::zero();
         for m in 1..(l + 1) {
             i3 = l - m + 1;
-            val = unsafe { *values.get_unchecked(i3 - 1) };
+            val = unsafe { *sorted_values.get_unchecked(i3 - 1) };
             s2 += val * val;
             s1 += val;
             w += One::one();
@@ -73,10 +72,10 @@ pub fn get_breaks<T>(values: &mut [T], nb_class: u32) -> Vec<T>
         j -= 1;
     }
     let mut breaks = Vec::with_capacity(nb_class as usize);
-    breaks.push(values[0]);
+    breaks.push(sorted_values[0]);
     for i in 1..nb_class {
-        breaks.push(values[(kclass[(i - 1) as usize] - 1) as usize]);
+        breaks.push(sorted_values[(kclass[(i - 1) as usize] - 1) as usize]);
     }
-    breaks.push(values[(nb_elem - 1)]);
+    breaks.push(sorted_values[(nb_elem - 1)]);
     breaks
 }

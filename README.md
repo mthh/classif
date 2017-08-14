@@ -1,8 +1,8 @@
 # classif
 **wip**
 
-Rust library for (statistical) data classification, especially methods used in cartography  
-(Natural Breaks, Equal invervals, quantiles, head-tail breaks)
+Rust library for data classification, especially methods used in cartography, and simple statistics.
+(Availables classification methods: Natural Breaks, Equal invervals, quantiles, head-tail breaks)
 
 
 ## License

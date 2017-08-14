@@ -1,7 +1,10 @@
 use std::str::FromStr;
-use jenks;
-use num_traits::{Float, NumAssignOps, Zero};
+use num_traits::{Float, NumAssignOps};
 
+use stats::mean;
+use jenks::get_jenks_breaks;
+
+#[derive(PartialEq, Debug)]
 pub enum Classification {
     EqualInterval,
     HeadTail,
@@ -37,23 +40,35 @@ pub struct BoundsInfo<T> {
 impl<T> BoundsInfo<T>
     where T: Float + NumAssignOps
 {
-    pub fn new(nb_class: u32, values: &[T], type_classif: Classification) -> Self {
-        let mut v = values.to_vec();
-        let breaks = match type_classif {
-            Classification::JenksNaturalBreaks => jenks::get_breaks(&mut v, nb_class),
-            Classification::Quantiles => get_quantiles(&mut v, nb_class),
-            Classification::EqualInterval => get_equal_interval(&mut v, nb_class),
-            Classification::HeadTail => get_head_tail_breaks(&mut v),
-            Classification::TailHead => get_tail_head_breaks(&mut v),
-        };
-        BoundsInfo {
-            type_classif: type_classif,
-            nb_class: (breaks.len() - 1) as u32,
-            bounds: breaks,
-            min: v[0],
-            max: v[v.len() - 1],
-            mean: get_mean(&v),
+    pub fn new(nb_class: u32,
+               values: &[T],
+               type_classif: Classification)
+               -> Result<Self, &'static str> {
+        let nb_elem = values.len();
+        if nb_elem < 2 {
+            return Err("Too small number of values!".into());
+        } else if !(type_classif == Classification::HeadTail ||
+                    type_classif == Classification::TailHead) &&
+                  (nb_class < 2 || nb_class > nb_elem as u32) {
+            return Err("Invalid number of class");
         }
+        let mut v = values.to_vec();
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let breaks = match type_classif {
+            Classification::JenksNaturalBreaks => get_jenks_breaks(&v, nb_class),
+            Classification::Quantiles => get_quantiles(&v, nb_class),
+            Classification::EqualInterval => get_equal_interval(&v, nb_class),
+            Classification::HeadTail => get_head_tail_breaks(&v),
+            Classification::TailHead => get_tail_head_breaks(&v),
+        };
+        Ok(BoundsInfo {
+               type_classif: type_classif,
+               nb_class: (breaks.len() - 1) as u32,
+               bounds: breaks,
+               min: v[0],
+               max: v[v.len() - 1],
+               mean: mean(&v),
+           })
     }
 
     pub fn get_class_index(&self, value: T) -> Option<u32> {
@@ -67,13 +82,13 @@ impl<T> BoundsInfo<T>
 }
 
 
-pub fn get_equal_interval<T>(values: &mut [T], nb_class: u32) -> Vec<T>
+pub fn get_equal_interval<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     where T: Float + NumAssignOps
 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    // values.sort_by(|a, b| a.partial_cmp(b).unwrap());
     // let nb_elem = values.len();
-    let min = values.first().unwrap();
-    let max = values.last().unwrap();
+    let min = sorted_values.first().unwrap();
+    let max = sorted_values.last().unwrap();
     let interval = (*max - *min) / T::from(nb_class).unwrap();
     let mut breaks = Vec::new();
     let mut val = *min;
@@ -88,45 +103,35 @@ pub fn get_equal_interval<T>(values: &mut [T], nb_class: u32) -> Vec<T>
     breaks
 }
 
-pub fn get_quantiles<T>(values: &mut [T], nb_class: u32) -> Vec<T>
+pub fn get_quantiles<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     where T: Float
 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let nb_elem: usize = values.len();
+    let nb_elem: usize = sorted_values.len();
     let mut breaks = Vec::new();
-    breaks.push(values[0]);
+    breaks.push(sorted_values[0]);
     let step = nb_elem as f64 / nb_class as f64;
     for i in 1..nb_class {
         let qidx = (i as f64 * step + 0.49).floor() as usize;
-        breaks.push(values[qidx - 1]);
+        breaks.push(sorted_values[qidx - 1]);
     }
-    breaks.push(values[nb_elem - 1]);
+    breaks.push(sorted_values[nb_elem - 1]);
     breaks
 }
 
-fn get_mean<T>(values: &[T]) -> T
+pub fn get_head_tail_breaks<T>(sorted_values: &[T]) -> Vec<T>
     where T: Float + NumAssignOps
 {
-    let mut sum: T = Zero::zero();
-    values.iter().map(|v| sum += *v).collect::<Vec<_>>();
-    sum / T::from(values.len()).unwrap()
-}
-
-pub fn get_head_tail_breaks<T>(values: &mut [T]) -> Vec<T>
-    where T: Float + NumAssignOps
-{
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let mut _mean = get_mean(&values);
+    let mut _mean = mean(&sorted_values);
     let mut breaks = Vec::new();
     let mut t;
-    breaks.push(values[0]);
+    breaks.push(sorted_values[0]);
     loop {
-        t = values
+        t = sorted_values
             .iter()
             .filter(|&v| *v > _mean)
             .cloned()
             .collect::<Vec<T>>();
-        _mean = get_mean(&t);
+        _mean = mean(&t);
         breaks.push(_mean);
         if t.len() < 2 {
             break;
@@ -135,21 +140,20 @@ pub fn get_head_tail_breaks<T>(values: &mut [T]) -> Vec<T>
     breaks
 }
 
-pub fn get_tail_head_breaks<T>(values: &mut [T]) -> Vec<T>
+pub fn get_tail_head_breaks<T>(sorted_values: &[T]) -> Vec<T>
     where T: Float + NumAssignOps
 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let mut _mean = get_mean(&values);
+    let mut _mean = mean(&sorted_values);
     let mut breaks = Vec::new();
     let mut t;
-    breaks.push(*values.last().unwrap());
+    breaks.push(*sorted_values.last().unwrap());
     loop {
-        t = values
+        t = sorted_values
             .iter()
             .filter(|&v| *v < _mean)
             .cloned()
             .collect::<Vec<T>>();
-        _mean = get_mean(&t);
+        _mean = mean(&t);
         breaks.push(_mean);
         if t.len() < 2 {
             break;
