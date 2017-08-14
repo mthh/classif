@@ -1,5 +1,6 @@
 use num_traits::{Float, NumAssignOps};
 
+/// Compute the mean of a list of values.
 pub fn mean<T>(values: &[T]) -> T
     where T: Float + NumAssignOps
 {
@@ -8,6 +9,9 @@ pub fn mean<T>(values: &[T]) -> T
     sum / T::from(values.len()).unwrap()
 }
 
+/// Compute the kurtosis value of list of values.
+/// The implementation is based on Fischer's definition (normal ==> 0.0)
+/// and use unbiased estimators.
 pub fn kurtosis<T>(values: &[T]) -> T
     where T: Float + NumAssignOps
 {
@@ -40,6 +44,8 @@ pub fn sum_pow_deviations<T>(values: &[T], n: i32) -> T
     sum
 }
 
+/// Compute the variance of a list of values.
+/// The variance is the sum of squared deviations from the mean.
 pub fn variance<T>(values: &[T]) -> T
     where T: Float + NumAssignOps
 {

@@ -1,9 +1,28 @@
 # classif
+[![Build Status](https://travis-ci.org/mthh/classif.svg?branch=master)](https://travis-ci.org/mthh/classif)
+
 **wip**
 
-Rust library for data classification, especially methods used in cartography, and simple statistics.
-(Availables classification methods: Natural Breaks, Equal invervals, quantiles, head-tail breaks)
+Rust library for data classification, especially methods used in cartography, and simple statistics.  
+Availables classification methods: **Jenks Natural Breaks**, **Equal Invervals**, **Quantiles**, **Arithmetic Progression** and **Head-Tail Breaks**.
 
+
+## Usage
+
+To use `classif`, first add this to your `Cargo.toml`:
+
+```toml
+[dependencies]
+classif = { git = "https://github.com/mthh/classif" }
+```
+
+Then, add this to your crate root:
+
+```rust
+extern crate classif;
+```
+
+The API documentation of this library can be found at xxx.
 
 ## License
 

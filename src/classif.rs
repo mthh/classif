@@ -11,6 +11,7 @@ pub enum Classification {
     TailHead,
     JenksNaturalBreaks,
     Quantiles,
+    Arithmetic,
 }
 
 impl FromStr for Classification {
@@ -23,11 +24,36 @@ impl FromStr for Classification {
             "EqualInverval" => Ok(Classification::EqualInterval),
             "HeadTail" => Ok(Classification::HeadTail),
             "TailHead" => Ok(Classification::TailHead),
+            "Arithmetic" => Ok(Classification::Arithmetic),
             _ => Err("Invalid classification name"),
         }
     }
 }
 
+/// A struct containing the bounds computed at its creation and some basic
+/// statistical informations : minimum, maximum and mean value.
+///
+/// The main field of `BoundsInfo` struct is the `bounds` field: a `Vec<T>`
+/// containing the bounds. The lower bound is the minimum of the input values
+/// and the upper bound is the maximum.
+///
+/// The `get_class_index` method allows to retrieve the index of the cluster in which
+/// belongs an input value.
+///
+/// ### Example :
+///
+/// ```rust,ignore
+/// let values = vec![1.0, 1.3, 2.4, 5.0, 2.1, 5.3, 4.0, 3.0, 1.3, 4.3, 6.0, 2.1];
+/// let bounds_info = BoundsInfo::new(4, values, Classification::EqualInterval).unwrap();
+/// // The first bounds value is the minimum:
+/// assert_almost_equal(bounds_info.bounds[0], bounds_info.min);
+/// // And the last bounds value is the maximum:
+/// assert_almost_equal(bounds_info.bounds.last().unwrap(), bounds_info.max);
+/// // So for 4 class we need a vector of 5 values :
+/// assert_eq!(bounds_info.bounds.len(), 5);
+/// // In which class belong the value 4.4 ?
+/// let ix = bounds_info.get_class_index(4.4).unwrap();
+/// ```
 pub struct BoundsInfo<T> {
     pub type_classif: Classification,
     pub nb_class: u32,
@@ -60,6 +86,7 @@ impl<T> BoundsInfo<T>
             Classification::EqualInterval => get_equal_interval(&v, nb_class),
             Classification::HeadTail => get_head_tail_breaks(&v),
             Classification::TailHead => get_tail_head_breaks(&v),
+            Classification::Arithmetic => get_arithmetic_breaks(&v, nb_class),
         };
         Ok(BoundsInfo {
                type_classif: type_classif,
@@ -73,7 +100,7 @@ impl<T> BoundsInfo<T>
 
     pub fn get_class_index(&self, value: T) -> Option<u32> {
         for i in 0..self.bounds.len() - 1 {
-            if value <= self.bounds[i + 1usize] {
+            if value <= self.bounds[i + 1usize] && value > self.bounds[i] {
                 return Some(i as u32);
             }
         }
@@ -160,5 +187,24 @@ pub fn get_tail_head_breaks<T>(sorted_values: &[T]) -> Vec<T>
         }
     }
     breaks.reverse();
+    breaks
+}
+
+pub fn get_arithmetic_breaks<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
+    where T: Float + NumAssignOps
+{
+    let mut denominator = T::zero();
+    for i in 1..nb_class + 1 {
+        denominator += T::from(i).unwrap();
+    }
+    let mut breaks = Vec::new();
+    let tmp_min = sorted_values[0];
+    let tmp_max = sorted_values[sorted_values.len() - 1];
+    let interval = (tmp_max - tmp_min) / denominator;
+    breaks.push(tmp_min);
+    for i in 1..nb_class + 1 {
+        let v = breaks[(i - 1) as usize];
+        breaks.push(v + (T::from(i).unwrap() * interval));
+    }
     breaks
 }

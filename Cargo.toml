@@ -2,6 +2,11 @@
 name = "classif"
 version = "0.1.0"
 authors = ["Matthieu Viry <matthieu.viry@cnrs.fr>"]
+description = "Library for one-dimensional data classification and basic statistics"
+license = "MIT/Apache-2.0"
+repository = "https://github.com/mthh/classif"
+readme = "README.md"
+keywords = ["statistics", "classification", "natural-breaks", "cartography"]
 
 [dependencies]
 num-traits = "^0.1"
