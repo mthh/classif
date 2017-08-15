@@ -173,7 +173,7 @@ pub fn get_head_tail_breaks<T>(sorted_values: &[T]) -> Vec<T>
     breaks
 }
 
-/// Compute the "Tail-Head" breaks on a list of sorted values.
+/// Compute the "Tail-Head" breaks on a list of sorted values
 /// (its actually just the inverse of the Head-Tail method,
 /// to be used on heavily left skewed distributions).
 pub fn get_tail_head_breaks<T>(sorted_values: &[T]) -> Vec<T>

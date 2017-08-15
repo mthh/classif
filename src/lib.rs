@@ -1,8 +1,26 @@
+//! Library for **one-dimensional data classification** and **simple statistics**,
+//! especially methods used for cartographic purposes such as "quantiles breaks"
+//! or "Jenks natural breaks".
+//!
+//! This library allows to computed break values according to a few methods (listed in
+//! the `Classification` Enum).
+//! Theses break values can be computed by creating a new `BoundsInfo` struct.
+//!
+//! If the input values are already sorted and you don't care about error checking
+//! you can directly use the `get_{jenks|quantiles|etc...}_breaks` functions.
+//!
+//! This library also provide a few basic statistical functionnalities, allowing to
+//! compute mean value, kurtosis value, standard deviation, variance, root of mean square, etc.
+//!
+
 extern crate num_traits;
 
+/// Basic statistical functionnalities: mean, standard deviation, kurtosis, variance, etc.
 pub mod stats;
+
 mod jenks;
 mod classif;
+
 pub use classif::{Classification, BoundsInfo};
 pub use jenks::get_jenks_breaks;
 pub use classif::{get_quantiles, get_equal_interval, get_head_tail_breaks, get_tail_head_breaks,

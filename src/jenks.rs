@@ -27,7 +27,7 @@ impl<T: PartialEq + Clone> Matrix<T> {
     }
 }
 
-/// Compute the "Natural Breaks" based on Jenks optimization.
+/// Compute the "Natural Breaks" on a list of sorted values, based on Jenks optimization.
 pub fn get_jenks_breaks<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     where T: Float + NumAssignOps
 {
