@@ -51,3 +51,23 @@ pub fn variance<T>(values: &[T]) -> T
 {
     sum_pow_deviations(values, 2) / T::from(values.len()).unwrap()
 }
+
+/// Compute the standard deviation of a list of values.
+pub fn standard_deviation<T>(values: &[T]) -> T
+    where T: Float + NumAssignOps
+{
+    T::sqrt(variance(&values))
+}
+
+/// Compute the root mean square of list of values.
+pub fn rootmeansquare<T>(values: &[T]) -> T
+    where T: Float + NumAssignOps
+{
+    let sum: T = values
+        .iter()
+        .fold(T::zero(), |mut s, v| {
+            s += v.powi(2);
+            s
+        });
+    (sum / T::from(values.len()).unwrap()).sqrt()
+}

@@ -5,6 +5,7 @@ use stats::mean;
 use jenks::get_jenks_breaks;
 
 #[derive(PartialEq, Debug)]
+/// The various type of classification methods availables.
 pub enum Classification {
     EqualInterval,
     HeadTail,
@@ -98,6 +99,8 @@ impl<T> BoundsInfo<T>
            })
     }
 
+    /// Returns the index of the class to which the `value` belongs, wrapped
+    /// in an Option. Returns None if the value is outside the serie range.
     pub fn get_class_index(&self, value: T) -> Option<u32> {
         for i in 0..self.bounds.len() - 1 {
             if value <= self.bounds[i + 1usize] && value > self.bounds[i] {
@@ -108,7 +111,7 @@ impl<T> BoundsInfo<T>
     }
 }
 
-
+/// Compute the equal interval breaks on a list of sorted values.
 pub fn get_equal_interval<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     where T: Float + NumAssignOps
 {
@@ -130,6 +133,7 @@ pub fn get_equal_interval<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     breaks
 }
 
+/// Compute the quantiles breaks on a list of sorted values.
 pub fn get_quantiles<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     where T: Float
 {
@@ -145,6 +149,8 @@ pub fn get_quantiles<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     breaks
 }
 
+/// Compute the "Head-Tail" breaks on a list of sorted values
+/// (to be used on heavily right skewed distributions).
 pub fn get_head_tail_breaks<T>(sorted_values: &[T]) -> Vec<T>
     where T: Float + NumAssignOps
 {
@@ -167,6 +173,9 @@ pub fn get_head_tail_breaks<T>(sorted_values: &[T]) -> Vec<T>
     breaks
 }
 
+/// Compute the "Tail-Head" breaks on a list of sorted values.
+/// (its actually just the inverse of the Head-Tail method,
+/// to be used on heavily left skewed distributions).
 pub fn get_tail_head_breaks<T>(sorted_values: &[T]) -> Vec<T>
     where T: Float + NumAssignOps
 {
@@ -190,6 +199,7 @@ pub fn get_tail_head_breaks<T>(sorted_values: &[T]) -> Vec<T>
     breaks
 }
 
+/// Compute the "arithmetic progression" breaks on a list of sorted values.
 pub fn get_arithmetic_breaks<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     where T: Float + NumAssignOps
 {

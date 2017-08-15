@@ -27,14 +27,14 @@ impl<T: PartialEq + Clone> Matrix<T> {
     }
 }
 
+/// Compute the "Natural Breaks" based on Jenks optimization.
 pub fn get_jenks_breaks<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
     where T: Float + NumAssignOps
 {
-    let k = nb_class as usize;
+    let k: usize = nb_class as usize;
     let nb_elem: usize = sorted_values.len();
     let mut v1 = Matrix::new(1, nb_elem);
     let mut v2 = Matrix::new(Float::max_value(), nb_elem);
-
 
     let (mut v, mut val, mut s1, mut s2, mut w, mut i3, mut i4): (T, T, T, T, T, usize, usize);
 
@@ -63,18 +63,18 @@ pub fn get_jenks_breaks<T>(sorted_values: &[T], nb_class: u32) -> Vec<T>
             v2.set((l - 1, 0), v);
         }
     }
-    let mut kclass = vec![0; k as usize];
-    let mut k = nb_elem as u32;
-    let mut j = nb_class;
+    let mut kclass = vec![0usize; k];
+    let mut n = nb_elem;
+    let mut j = k;
     while j > 1 {
-        k = *v1.get(((k - 1) as usize, (j - 1) as usize)) as u32 - 1;
-        kclass[(j - 2) as usize] = k;
+        n = *v1.get(((n - 1), (j - 1))) - 1usize;
+        kclass[(j - 2)] = n;
         j -= 1;
     }
-    let mut breaks = Vec::with_capacity(nb_class as usize);
+    let mut breaks = Vec::with_capacity(k);
     breaks.push(sorted_values[0]);
-    for i in 1..nb_class {
-        breaks.push(sorted_values[(kclass[(i - 1) as usize] - 1) as usize]);
+    for i in 1..k {
+        breaks.push(sorted_values[(kclass[i - 1usize] - 1)]);
     }
     breaks.push(sorted_values[(nb_elem - 1)]);
     breaks

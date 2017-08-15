@@ -5,7 +5,8 @@ mod jenks;
 mod classif;
 pub use classif::{Classification, BoundsInfo};
 pub use jenks::get_jenks_breaks;
-pub use classif::{get_quantiles, get_equal_interval, get_head_tail_breaks, get_arithmetic_breaks};
+pub use classif::{get_quantiles, get_equal_interval, get_head_tail_breaks, get_tail_head_breaks,
+                  get_arithmetic_breaks};
 
 #[cfg(test)]
 mod tests {
@@ -79,23 +80,6 @@ mod tests {
                     6.238095238095237,
                     8.857142857142856,
                     12.]);
-
-    }
-
-    #[test]
-    fn test_kurtosis() {
-        let values = get_test_values();
-        let kv = stats::kurtosis(&values);
-        assert_eq!(kv, 0.042107329018970074);
-    }
-
-    #[test]
-    fn test_deviations() {
-        let values = get_test_values();
-        let r = stats::sum_pow_deviations(&values, 2);
-        assert_eq!(r, 608.631578947369);
-        let v = stats::variance(&values);
-        assert_eq!(v, 8.008310249307486);
     }
 
     #[test]
@@ -113,5 +97,27 @@ mod tests {
         assert_eq!(b.get_class_index(10.), Some(3));
         // 15.0 is larger than the maximum so it belongs in no class, None is expected:
         assert_eq!(b.get_class_index(15.0), None);
+    }
+
+    #[test]
+    fn test_kurtosis() {
+        let values = get_test_values();
+        let kv = stats::kurtosis(&values);
+        assert_eq!(kv, 0.042107329018970074);
+    }
+
+    #[test]
+    fn test_variance() {
+        let values = get_test_values();
+        let r = stats::sum_pow_deviations(&values, 2);
+        assert_eq!(r, 608.631578947369);
+        let v = stats::variance(&values);
+        assert_eq!(v, 8.008310249307486);
+    }
+
+    fn test_root_mean_square() {
+        let values = [-1., 1., -1., 1.];
+        let v = stats::rootmeansquare(&values);
+        assert_eq!(v, 1.);
     }
 }
