@@ -50,7 +50,7 @@ impl FromStr for Classification {
 /// let values = vec![1.0, 1.3, 2.4, 5.0, 2.1, 5.3, 4.0, 3.0, 1.3, 4.3, 6.0, 2.1];
 /// let bounds_info = classif::BoundsInfo::new(4, &values, classif::Classification::EqualInterval).unwrap();
 /// // The first bounds value is the minimum:
-/// assert_eq!(bounds_info.bounds.first().unwrap(), bounds_info.min);
+/// assert_eq!(*bounds_info.bounds.first().unwrap(), bounds_info.min);
 /// // And the last bounds value is the maximum:
 /// assert_eq!(*bounds_info.bounds.last().unwrap(), bounds_info.max);
 /// // So for 4 class we need a vector of 5 values :
