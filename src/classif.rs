@@ -38,23 +38,27 @@ impl FromStr for Classification {
 /// containing the bounds. The lower bound is the minimum of the input values
 /// and the upper bound is the maximum.
 ///
-/// The `get_class_index` method allows to retrieve the index of the cluster in which
+/// The [`get_class_index`] method allows to retrieve the index of the cluster in which
 /// belongs an input value.
 ///
 /// ### Example :
 ///
-/// ```rust,ignore
+/// ```rust
+/// extern crate classif;
+/// extern crate num_traits;
+///
 /// let values = vec![1.0, 1.3, 2.4, 5.0, 2.1, 5.3, 4.0, 3.0, 1.3, 4.3, 6.0, 2.1];
-/// let bounds_info = BoundsInfo::new(4, values, Classification::EqualInterval).unwrap();
+/// let bounds_info = classif::BoundsInfo::new(4, &values, classif::Classification::EqualInterval).unwrap();
 /// // The first bounds value is the minimum:
-/// assert_almost_equal(bounds_info.bounds[0], bounds_info.min);
+/// assert_eq!(bounds_info.bounds.first().unwrap(), bounds_info.min);
 /// // And the last bounds value is the maximum:
-/// assert_almost_equal(bounds_info.bounds.last().unwrap(), bounds_info.max);
+/// assert_eq!(*bounds_info.bounds.last().unwrap(), bounds_info.max);
 /// // So for 4 class we need a vector of 5 values :
 /// assert_eq!(bounds_info.bounds.len(), 5);
 /// // In which class belong the value 4.4 ?
 /// let ix = bounds_info.get_class_index(4.4).unwrap();
 /// ```
+/// [`get_class_index`]: struct.BoundsInfo.html#method.get_class_index
 pub struct BoundsInfo<T> {
     pub type_classif: Classification,
     pub nb_class: u32,

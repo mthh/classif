@@ -9,6 +9,22 @@ pub fn mean<T>(values: &[T]) -> T
     sum / T::from(values.len()).unwrap()
 }
 
+/// Compute the median value, ie. the middle number of a list a value,
+/// ie. the value corresponding to the 0.5 quantile.
+pub fn median<T>(values: &[T]) -> T
+    where T: Float
+{
+    let mut v = values.to_vec();
+    v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    let n = values.len();
+    let m = (n as f64 / 2.).ceil() as usize;
+    if n % 2 != 0 {
+        v[m - 1usize]
+    } else {
+        (v[m - 1usize] + v[m]) / T::from(2.0).unwrap()
+    }
+}
+
 /// Compute the kurtosis value of list of values.
 /// The implementation is based on Fischer's definition (normal ==> 0.0)
 /// and use unbiased estimators.

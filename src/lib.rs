@@ -3,8 +3,8 @@
 //! or "Jenks natural breaks".
 //!
 //! This library allows to computed break values according to a few methods (listed in
-//! the `Classification` Enum).
-//! Theses break values can be computed by creating a new `BoundsInfo` struct.
+//! the [`Classification`] Enum).
+//! Theses break values can be computed by creating a new [`BoundsInfo`] struct.
 //!
 //! If the input values are already sorted and you don't care about error checking
 //! you can directly use the `get_{jenks|quantiles|etc...}_breaks` functions.
@@ -12,6 +12,8 @@
 //! This library also provide a few basic statistical functionnalities, allowing to
 //! compute mean value, kurtosis value, standard deviation, variance, root of mean square, etc.
 //!
+//! [`Classification`]: enum.Classification.html
+//! [`BoundsInfo`]: struct.BoundsInfo.html
 
 extern crate num_traits;
 
@@ -133,9 +135,22 @@ mod tests {
         assert_eq!(v, 8.008310249307486);
     }
 
+    #[test]
     fn test_root_mean_square() {
         let values = [-1., 1., -1., 1.];
         let v = stats::rootmeansquare(&values);
         assert_eq!(v, 1.);
+    }
+
+    #[test]
+    fn test_median() {
+        // Number of values is odd:
+        let values = [1., 3., 3., 6., 7., 8., 9.];
+        let median = stats::median(&values);
+        assert_eq!(median, 6.);
+        // Number of values is even:
+        let values = [1., 2., 3., 4., 5., 6., 8., 9.];
+        let median = stats::median(&values);
+        assert_eq!(median, 4.5);
     }
 }
