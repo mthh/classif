@@ -1,7 +1,6 @@
 # classif
 [![Build Status](https://travis-ci.org/mthh/classif.svg?branch=master)](https://travis-ci.org/mthh/classif)
 
-**wip**
 
 Rust library for data classification, especially methods used in cartography, and simple statistics.  
 Availables classification methods: **Jenks Natural Breaks**, **Equal Invervals**, **Quantiles**, **Arithmetic Progression** and **Head-Tail Breaks**.
@@ -13,7 +12,7 @@ To use `classif`, first add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-classif = { git = "https://github.com/mthh/classif" }
+classif = "0.0.1"
 ```
 
 Then, add this to your crate root:
@@ -22,7 +21,7 @@ Then, add this to your crate root:
 extern crate classif;
 ```
 
-The API documentation of this library can be found at xxx.
+The API documentation of this library can be found at (https://docs.rs/classif](https://docs.rs/classif).
 
 ## License
 
