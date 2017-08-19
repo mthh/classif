@@ -21,7 +21,7 @@ Then, add this to your crate root:
 extern crate classif;
 ```
 
-The API documentation of this library can be found at (https://docs.rs/classif](https://docs.rs/classif).
+The API documentation of this library can be found at [https://docs.rs/classif](https://docs.rs/classif).
 
 ## License
 
