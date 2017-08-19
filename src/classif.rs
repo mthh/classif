@@ -107,7 +107,7 @@ impl<T> BoundsInfo<T>
     /// in an Option. Returns None if the value is outside the serie range.
     pub fn get_class_index(&self, value: T) -> Option<u32> {
         for i in 0..self.bounds.len() - 1 {
-            if value <= self.bounds[i + 1usize] && value > self.bounds[i] {
+            if value <= self.bounds[i + 1usize] && value >= self.bounds[i] {
                 return Some(i as u32);
             }
         }
