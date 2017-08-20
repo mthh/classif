@@ -12,7 +12,7 @@ To use `classif`, first add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-classif = "0.0.1"
+classif = "0.0.2"
 ```
 
 Then, add this to your crate root:
