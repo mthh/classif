@@ -14,7 +14,8 @@
 //!
 //! [`Classification`]: enum.Classification.html
 //! [`BoundsInfo`]: struct.BoundsInfo.html
-
+#[macro_use]
+extern crate assert_approx_eq;
 extern crate num_traits;
 
 /// Basic statistical functionnalities: mean, standard deviation, kurtosis, variance, etc.
@@ -31,6 +32,7 @@ pub use classif::{get_quantiles, get_equal_interval, get_head_tail_breaks, get_t
 #[cfg(test)]
 mod tests {
     use ::*;
+    use num_traits::Float;
     fn get_test_values() -> [f64; 76] {
         [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,
          3.0, 3.0, 3.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0, 12.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
@@ -152,5 +154,19 @@ mod tests {
         let values = [1., 2., 3., 4., 5., 6., 8., 9.];
         let median = stats::median(&values);
         assert_eq!(median, 4.5);
+    }
+
+    #[test]
+    fn test_harmonic_mean() {
+        let values = [2., 3.];
+        let v = stats::harmonic_mean(&values).unwrap();
+        assert_approx_eq!(v, 2.4);
+    }
+
+    #[test]
+    fn test_geometric_mean() {
+        let values = [1., 8., 9., 7., 6., 8., 19., 32.];
+        let res = stats::geometric_mean(&values).unwrap();
+        assert_eq!(res, 7.869496003150113);
     }
 }

@@ -87,3 +87,29 @@ pub fn rootmeansquare<T>(values: &[T]) -> T
         });
     (sum / T::from(values.len()).unwrap()).sqrt()
 }
+
+pub fn harmonic_mean<T>(values: &[T]) -> Result<T, &'static str>
+    where T: Float + NumAssignOps
+{
+    let mut reciprocal_sum = T::zero();
+    for v in values {
+        if *v <= T::zero() {
+            return Err("harmonic_mean requires only positive numbers as input".into());
+        }
+        reciprocal_sum += T::from(1.0).unwrap() / *v
+    }
+    Ok(T::from(values.len()).unwrap() / reciprocal_sum)
+}
+
+pub fn geometric_mean<T>(values: &[T]) -> Result<T, &'static str>
+    where T: Float + NumAssignOps
+{
+    let mut val = T::one();
+    for v in values {
+        if *v <= T::zero() {
+            return Err("geometric_mean requires only positive numbers as input".into());
+        }
+        val *= *v;
+    }
+    Ok(val.powf(T::one() / T::from(values.len()).unwrap()))
+}

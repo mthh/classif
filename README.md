@@ -4,7 +4,7 @@
 
 Rust library for data classification, especially methods used in cartography, and simple statistics.  
 Availables classification methods: **Jenks Natural Breaks**, **Equal Invervals**, **Quantiles**, **Arithmetic Progression** and **Head-Tail Breaks**.
-
+Statistical functions: *mean, median, kurtosis, variance, standard deviation, root mean square, harmonic mean* and *geometric mean*.
 
 ## Usage
 

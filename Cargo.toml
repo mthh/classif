@@ -10,3 +10,4 @@ keywords = ["statistics", "classification", "natural-breaks", "cartography"]
 
 [dependencies]
 num-traits = "^0.1"
+assert_approx_eq = "1.0.0"
