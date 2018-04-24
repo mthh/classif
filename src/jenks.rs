@@ -22,7 +22,7 @@ impl<T: PartialEq + Clone> Matrix<T> {
 
     #[inline(always)]
     pub fn set(&mut self, ix: (usize, usize), value: T) {
-        let mut v = unsafe { self.values.get_unchecked_mut(ix.0 * self.dim + ix.1) };
+        let v = unsafe { self.values.get_unchecked_mut(ix.0 * self.dim + ix.1) };
         *v = value;
     }
 }

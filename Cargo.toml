@@ -9,5 +9,7 @@ readme = "README.md"
 keywords = ["statistics", "classification", "natural-breaks", "cartography"]
 
 [dependencies]
-num-traits = "^0.1"
+num-traits = "0.2"
 assert_approx_eq = "1.0.0"
+failure = "*"
+failure_derive = "*"

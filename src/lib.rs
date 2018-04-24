@@ -17,6 +17,8 @@
 #[macro_use]
 extern crate assert_approx_eq;
 extern crate num_traits;
+extern crate failure;
+#[macro_use] extern crate failure_derive;
 
 /// Basic statistical functionnalities: mean, standard deviation, kurtosis, variance, etc.
 pub mod stats;
@@ -28,6 +30,29 @@ pub use classif::{Classification, BoundsInfo};
 pub use jenks::get_jenks_breaks;
 pub use classif::{get_quantiles, get_equal_interval, get_head_tail_breaks, get_tail_head_breaks,
                   get_arithmetic_breaks};
+
+
+mod error {
+    use std::{self, fmt};
+    #[derive(Fail, Debug)]
+    pub enum ClassifError {
+      #[fail(display = "{} requires only positive numbers as input", _0)]
+      OnlyPositive(MayFail),
+      #[fail(display = "An unknown error has occurred.")]
+      UnknownError,
+    }
+    #[derive(Debug)]
+    pub enum MayFail {
+        HarmonicMean,
+        GeometricMean,
+    }
+    impl std::fmt::Display for MayFail {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "{}", format!("{:?}", self))
+        }
+    }
+    pub type ClassifResult<T> = std::result::Result<T, ClassifError>;
+}
 
 #[cfg(test)]
 mod tests {

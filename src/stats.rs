@@ -1,4 +1,5 @@
 use num_traits::{Float, NumAssignOps};
+use error::{ClassifError, ClassifResult, MayFail};
 
 /// Compute the mean of a list of values.
 pub fn mean<T>(values: &[T]) -> T
@@ -48,6 +49,8 @@ pub fn kurtosis<T>(values: &[T]) -> T
      T::from(3).unwrap() * (n - T::from(1).unwrap()))
 }
 
+/// Compute the sum of deviations to the Nth power.
+/// (i.e. sum of squared deviations when n=2, sum of cubed deviations when n=3, etc.)
 pub fn sum_pow_deviations<T>(values: &[T], n: i32) -> T
     where T: Float + NumAssignOps
 {
@@ -88,26 +91,64 @@ pub fn rootmeansquare<T>(values: &[T]) -> T
     (sum / T::from(values.len()).unwrap()).sqrt()
 }
 
-pub fn harmonic_mean<T>(values: &[T]) -> Result<T, &'static str>
+/// This mean is calculated by taking the reciprocal of the arithmetic mean
+/// of the reciprocals of the input numbers.
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate assert_approx_eq;
+/// # extern crate num_traits;
+/// # extern crate classif;
+/// #
+/// # use num_traits::float::Float;
+/// # use classif::stats;
+/// #
+/// # fn main() {
+/// let values = [2., 3.];
+/// let res = stats::harmonic_mean(&values).unwrap();
+/// // -> 2.4
+/// # assert_approx_eq!(res, 2.4, 0.00001);
+/// # }
+/// ```
+pub fn harmonic_mean<T>(values: &[T]) -> ClassifResult<T>
     where T: Float + NumAssignOps
 {
     let mut reciprocal_sum = T::zero();
     for v in values {
         if *v <= T::zero() {
-            return Err("harmonic_mean requires only positive numbers as input".into());
+            return Err(ClassifError::OnlyPositive(MayFail::HarmonicMean));
         }
         reciprocal_sum += T::from(1.0).unwrap() / *v
     }
     Ok(T::from(values.len()).unwrap() / reciprocal_sum)
 }
 
-pub fn geometric_mean<T>(values: &[T]) -> Result<T, &'static str>
+/// Compute the central number in a geometric progression,
+/// also calculable as the nth root of a product of n numbers.
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate assert_approx_eq;
+/// # extern crate num_traits;
+/// # extern crate classif;
+/// #
+/// # use num_traits::float::Float;
+/// # use classif::stats;
+/// #
+/// # fn main() {
+/// let values = [3., 9., 27.];
+/// let res = stats::geometric_mean(&values).unwrap();
+/// // -> 9.
+/// # assert_approx_eq!(res, 9., 0.00001);
+/// # }
+/// ```
+pub fn geometric_mean<T>(values: &[T]) -> ClassifResult<T>
     where T: Float + NumAssignOps
 {
     let mut val = T::one();
     for v in values {
         if *v <= T::zero() {
-            return Err("geometric_mean requires only positive numbers as input".into());
+            return Err(ClassifError::OnlyPositive(MayFail::GeometricMean));
         }
         val *= *v;
     }
